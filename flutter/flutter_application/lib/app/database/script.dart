@@ -19,7 +19,6 @@ VALUES('All-might','(44)92222-2222','allMight@email.com','https://giffiles.alpha
 ''';
 
 final insert3 = '''
-INSERT INTO contact(no me, telefone, email, url_avatar)
+INSERT INTO contact(nome, telefone, email, url_avatar)
 VALUES('Uraraka','(44)933333-3333','uararaka@email.com','https://66.media.tumblr.com/8685b856b3495a119bf4913e4783a093/tumblr_o5s0bf6laz1qa94xto2_500.gif')
 ''';
- 
