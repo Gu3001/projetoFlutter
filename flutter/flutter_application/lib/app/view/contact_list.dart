@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/app/database/sqlite/connection.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:flutter_application/app/database/sqlite/dao/contact_dao_impl.dart';
+import 'package:flutter_application/app/domain/entities/contact.dart';
 
 import '../my_app.dart';
 
@@ -12,10 +11,11 @@ class ContactList extends StatelessWidget {
   //   {'nome':'Uraraka','telefone':'(44)933333-3333', 'avatar':'https://66.media.tumblr.com/8685b856b3495a119bf4913e4783a093/tumblr_o5s0bf6laz1qa94xto2_500.gif'},
   // ];
 
-  Future<List<Map<String, dynamic>>>_buscar() async{
+  Future<List<Contact>>_buscar() async{
     //padrão android ou iphone join
-    Database db = await Connection.get();
-    return db.query('contact');
+    // Database db = await Connection.get();
+    // return db.query('contact');
+    return ContactDAOImpl().find();
   }
 
   @override
@@ -24,7 +24,7 @@ class ContactList extends StatelessWidget {
       future: _buscar(),
       builder: (context,futuro){
         if (futuro.hasData) {
-          var lista = futuro.data;
+          List<Contact> lista = futuro.data;
 
              //define componentes por padrão
           return Scaffold(
@@ -43,11 +43,11 @@ class ContactList extends StatelessWidget {
               itemCount: lista.length,
               itemBuilder: (context, i){
                 var contato = lista[i];
-                var avatar = CircleAvatar(backgroundImage: NetworkImage(contato['url_avatar']),);
+                var avatar = CircleAvatar(backgroundImage: NetworkImage(contato.urlAvatar),);
                 return ListTile(
                   leading: avatar,
-                  title: Text(contato['nome']),
-                  subtitle: Text(contato['telefone']),
+                  title: Text(contato.nome),
+                  subtitle: Text(contato.telefone),
                   trailing: Container(
                     width: 100,
                     child:Row(
