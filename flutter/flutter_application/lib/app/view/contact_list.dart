@@ -1,72 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/app/database/sqlite/dao/contact_dao_impl.dart';
 import 'package:flutter_application/app/domain/entities/contact.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 import '../my_app.dart';
+import 'contact_list_back.dart';
 
 class ContactList extends StatelessWidget {
-  // var lista = [
-  //   {'nome':'Deku','telefone':'(44)91111-1111', 'avatar':'https://media.tenor.com/images/bd54bef392a04239c6b46a976a473a43/tenor.gif'},
-  //   {'nome':'All-might','telefone':'(44)92222-2222', 'avatar':'https://giffiles.alphacoders.com/103/103159.gif'},
-  //   {'nome':'Uraraka','telefone':'(44)933333-3333', 'avatar':'https://66.media.tumblr.com/8685b856b3495a119bf4913e4783a093/tumblr_o5s0bf6laz1qa94xto2_500.gif'},
-  // ];
+  final _back = ContactListBack();
 
-  Future<List<Contact>>_buscar() async{
-    //padrão android ou iphone join
-    // Database db = await Connection.get();
-    // return db.query('contact');
-    return ContactDAOImpl().find();
+  CircleAvatar circleAvatar(String url){
+    try {
+      return CircleAvatar(backgroundImage: NetworkImage(url));
+    } catch (e) {
+      return CircleAvatar(child: Icon(Icons.person));
+    }
+  }
+
+  Widget iconEditButton(Function onPressed){
+    return IconButton(icon:Icon(Icons.edit), color: Colors.orange, onPressed:onPressed);
+  }
+
+   Widget iconRemoveButton(BuildContext context, Function remove){
+    return IconButton(
+      icon:Icon(Icons.delete), 
+      color: Colors.red,
+      onPressed:(){
+        showDialog(
+          context:context,
+          builder: (context) => AlertDialog(
+            title: Text('Excluir'),
+            content:Text('Confirma a Exclusão?'),
+            actions: [
+              FlatButton(
+                child:Text('Não'),
+                onPressed: (){
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text('Sim'),
+                onPressed: remove,
+              ),
+            ]
+          )
+        );
+      }
+      );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _buscar(),
-      builder: (context,futuro){
-        if (futuro.hasData) {
-          List<Contact> lista = futuro.data;
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Lista de Contatos'),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(MyApp.CONTACT_FORM);
+                })
+          ],
+        ),
+        body: Observer(builder: (context) {
+          return FutureBuilder(
+              future: _back.list,
+              builder: (context, futuro) {
+                if (!futuro.hasData) {
+                  return CircularProgressIndicator();
+                } else {
+                  //constroi a lista
+                  List<Contact> lista = futuro.data;
 
-             //define componentes por padrão
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Lista de Contatos'),
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed:(){
-                    Navigator.of(context).pushNamed(MyApp.CONTACT_FORM);
-                  }
-                  )
-              ],
-              ),
-            body: ListView.builder(
-              itemCount: lista.length,
-              itemBuilder: (context, i){
-                var contato = lista[i];
-                var avatar = CircleAvatar(backgroundImage: NetworkImage(contato.urlAvatar),);
-                return ListTile(
-                  leading: avatar,
-                  title: Text(contato.nome),
-                  subtitle: Text(contato.telefone),
-                  trailing: Container(
-                    width: 100,
-                    child:Row(
-                      children: [
-                        IconButton(icon: Icon(Icons.edit), onPressed: null),
-                        IconButton(icon: Icon(Icons.delete), onPressed: null),
-
-                      ],
-                    )
-                    ),
-                );
-              },
-            ),
-          );
-        }else {
-          return Scaffold();
-        }
-      }
-    );
- 
+                  //define componentes por padrão
+                  return ListView.builder(
+                    itemCount: lista.length,
+                    itemBuilder: (context, i) {
+                      var contato = lista[i];
+                      return ListTile(
+                        leading: circleAvatar(contato.urlAvatar), 
+                        title: Text(contato.nome),
+                        subtitle: Text(contato.telefone),
+                        trailing: Container(
+                            width: 100,
+                            child: Row(
+                              children: [
+                                iconEditButton((){
+                                  _back.goToForm(context, contato);
+                                }),
+                                iconRemoveButton(context, (){
+                                  _back.remove(contato.id);
+                                  Navigator.of(context).pop();
+                                })
+                              ],
+                            )),
+                      );
+                    },
+                  );
+                }
+              });
+        }));
   }
 }
