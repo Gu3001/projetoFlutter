@@ -34,6 +34,10 @@ goToForm(BuildContext context, [Contact contact]){
 
 }
 
+goToDetails(BuildContext context, Contact contact){
+  Navigator.of(context).pushNamed(MyApp.CONTACT_DETAILS, arguments: contact);
+}
+
 //excluir
 remove(int id){
   _service.remove(id);
