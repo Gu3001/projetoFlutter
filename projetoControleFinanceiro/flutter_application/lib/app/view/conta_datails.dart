@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/app/domain/entities/contact.dart';
-import 'package:flutter_application/app/view/contact_details_back.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_application/app/domain/entities/conta.dart';
+import 'package:flutter_application/app/view/conta_details_back.dart';
 
-class ContactDetails extends StatelessWidget {
+class ContaDetails extends StatelessWidget {
 
   showModalError(BuildContext context){
     var alert =AlertDialog(
@@ -20,8 +19,8 @@ class ContactDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _back=ContactDetailsBack(context);
-    Contact contact = _back.contact;
+    var _back=ContaDetailsBack(context);
+    Conta conta = _back.conta;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints){
@@ -33,21 +32,17 @@ class ContactDetails extends StatelessWidget {
           body: ListView(
             padding:EdgeInsets.all(60),
             children: [
-              (Uri.tryParse(contact.urlAvatar).isAbsolute)? 
-              CircleAvatar(
-                backgroundImage: NetworkImage(contact.urlAvatar),
-                radius: radius,
-                ):
-              CircleAvatar(child: Icon(Icons.person, size: width/2), radius: radius,)
+          
+              CircleAvatar(child: Icon(Icons.monetization_on, size: width/2), radius: radius,)
               ,
               Center(
-                child: Text('${contact.nome}', style: TextStyle(fontSize: 30),),
+                child: Text('${conta.nome}', style: TextStyle(fontSize: 30),),
                 
               ),
               Card(
                 child: ListTile(
-                  title: Text('Telefone:'),
-                  subtitle: Text('${contact.telefone}'),
+                  title: Text('Valor:'),
+                  subtitle: Text('${conta.valor}'),
                   trailing: Container(
                     width: width/4,
                     child: Row(
@@ -56,17 +51,11 @@ class ContactDetails extends StatelessWidget {
                       IconButton(
                         color:Colors.blue,
                         icon:Icon(Icons.message),
-                        onPressed: (){
-                          _back.launchSMS(showModalError); 
-                        },
                         ),
 
                         IconButton(
                         color:Colors.blue,
                         icon:Icon(Icons.phone),
-                        onPressed: (){
-                          _back.launchPhone(showModalError); 
-                        },
                         ),
 
                         ]
@@ -77,10 +66,7 @@ class ContactDetails extends StatelessWidget {
                Card(
                 child: ListTile(
                   title: Text('Email:'),
-                  onTap:(){
-                     _back.launchEmail(showModalError);
-                  },
-                  subtitle: Text('${contact.email}'),
+                  subtitle: Text('${conta.obs}'),
                 ),
               ),
             ],
